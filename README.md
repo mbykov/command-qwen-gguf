@@ -31,6 +31,7 @@ Vosk → Levenshtein → isMath → command-qwen-gguf → Browser
 
 ```bash
 go run cmd/run.go -config config.yaml -test tests.json
+```
 
 ## Благодарность
 
