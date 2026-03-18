@@ -18,13 +18,14 @@ Vosk → Levenshtein → isMath → command-qwen-gguf → Browser
 
 ## Структура
 
--.
--├── command.go # основная логика
--├── cmd/
--│ └── run.go # тестирование
--├── config.yaml # конфигурация
--└── tests.json # тестовые примеры
-
+```shell
+.
+├── command.go # основная логика
+├── cmd/
+│ └── run.go # тестирование
+├── config.yaml # конфигурация
+└── tests.json # тестовые примеры
+```
 
 ## Тестирование
 
