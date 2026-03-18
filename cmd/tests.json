@@ -1,0 +1,52 @@
+[
+  {
+    "name": "CREATE: два плюс три",
+    "context": null,
+    "current_text": "два плюс три",
+    "expected": {
+      "type": "command",
+      "name": "createLatex",
+      "script": "$2+3$",
+      "text": "два плюс три"
+    }
+  },
+  {
+    "name": "CREATE: интеграл от икс",
+    "context": null,
+    "current_text": "интеграл от икс",
+    "expected": {
+      "type": "command",
+      "name": "createLatex",
+      "script": "$\\int x$",
+      "text": "интеграл от икс"
+    }
+  },
+  {
+    "name": "EDIT: добавить корень из трех",
+    "context": {
+      "script": "2+3",
+      "text": "два плюс три"
+    },
+    "current_text": "добавь корень из трех",
+    "expected": {
+      "type": "command",
+      "name": "editLatex",
+      "script": "$2+3+\\sqrt{3}$",
+      "text": "добавь корень из трех"
+    }
+  },
+  {
+    "name": "EDIT: изменить два на три",
+    "context": {
+      "script": "$2+3$",
+      "text": "два плюс три"
+    },
+    "current_text": "измени два на три",
+    "expected": {
+      "type": "command",
+      "name": "editLatex",
+      "script": "$3+3$",
+      "text": "измени два на три"
+    }
+  }
+]

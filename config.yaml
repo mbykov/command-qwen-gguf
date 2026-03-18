@@ -1,0 +1,4 @@
+qwen:
+  model: "qwen2.5-0.5b.local"
+  url: "http://localhost:11434/api/chat"
+  timeout_sec: 5

@@ -1,0 +1,88 @@
+[
+  {
+    "name": "Случай a: текст-не-формула + создай латех",
+    "context": {
+      "type": "final",
+      "text": "хорошая погода"
+    },
+    "current": {
+      "type": "command",
+      "name": "showLatex",
+      "text": "создай латех",
+      "external": true
+    },
+    "expected": {
+      "type": "final",
+      "text": "создай латех"
+    }
+  },
+  {
+    "name": "Случай b: текст-формула + создай латех",
+    "context": {
+      "type": "final",
+      "text": "два плюс три"
+    },
+    "current": {
+      "type": "command",
+      "name": "showLatex",
+      "text": "создай латех",
+      "external": true
+    },
+    "expected": {
+      "type": "command",
+      "name": "latex_create",
+      "script": "$2+3$",
+      "text": "два плюс три"
+    }
+  },
+  {
+    "name": "Случай c: команда-создай + текст-не-формула",
+    "context": null,
+    "current": {
+      "type": "final",
+      "text": "хорошая погода"
+    },
+    "expected": {
+      "type": "final",
+      "text": "хорошая погода"
+    }
+  },
+  {
+    "name": "Случай d: команда-создай + текст-формула (модификация)",
+    "context": {
+      "type": "command",
+      "name": "latex_create",
+      "script": "$2+3$",
+      "text": "создай латех"
+    },
+    "current": {
+      "type": "final",
+      "text": "добавь корень из трех"
+    },
+    "expected": {
+      "type": "command",
+      "name": "latex_modify",
+      "script": "\\sqrt{3}",
+      "text": "добавь корень из трех"
+    }
+  },
+  {
+    "name": "Еще пример: команда-создай + текст-формула (другая формула)",
+    "context": {
+      "type": "command",
+      "name": "latex_create",
+      "script": "\\int x dx",
+      "text": "создай интеграл"
+    },
+    "current": {
+      "type": "final",
+      "text": "измени два на три"
+    },
+    "expected": {
+      "type": "command",
+      "name": "latex_modify",
+      "script": "2 \\to 3",
+      "text": "измени два на три"
+    }
+  }
+]
