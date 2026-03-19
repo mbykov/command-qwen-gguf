@@ -24,8 +24,9 @@ const (
 
 // CommandContext контекст предыдущей команды createLatex
 type CommandContext struct {
-    Script string `json:"script"` // существующий LaTeX скрипт
-    Text   string `json:"text"`    // исходное математическое выражение
+    Type   string `json:"type"`   // "final" или "command"
+    Text   string `json:"text"`    // текст (для final - фраза, для command - выражение)
+    Script string `json:"script,omitempty"` // LaTeX код (только для command)
 }
 
 // CommandRequest запрос в модуль command-qwen
@@ -86,13 +87,22 @@ func NewResolver(configPath string) (*CommandResolver, error) {
 
 // determineCommandType определяет, создание это или модификация
 func (r *CommandResolver) determineCommandType(req CommandRequest) (string, string, string) {
-    if req.Context == nil {
-        // Нет контекста → создание новой формулы
-        return "CREATE", req.CurrentText, ""
+    // Контекст всегда есть!
+
+    if req.Context.Type == "final" {
+        // Контекст из Vosk - это CREATE
+        // Параметры: (контекстный текст, команда)
+        return "CREATE", req.Context.Text, req.CurrentText
     }
 
-    // Есть контекст → модификация существующей
-    return "EDIT", req.Context.Script, req.CurrentText
+    if req.Context.Type == "command" {
+        // Контекст из предыдущей команды - это EDIT
+        // Параметры: (существующий LaTeX, инструкция)
+        return "EDIT", req.Context.Script, req.CurrentText
+    }
+
+    // На всякий случай fallback
+    return "CREATE", req.Context.Text, req.CurrentText
 }
 
 // buildPrompt создает промпт для Qwen
@@ -103,59 +113,18 @@ func (r *CommandResolver) buildPrompt(cmdType, param1, param2 string) string {
     case "CREATE":
         return fmt.Sprintf(`Convert this Russian mathematical phrase to LaTeX code.
 
-RULES:
-- Output ONLY the LaTeX code, no explanations
-- Keep it simple and clean
-- Use standard LaTeX commands
+Context (previous phrase): "%s"
+Command: "%s"
 
-EXAMPLES:
-Russian: "два плюс три"
-LaTeX: $2+3$
-
-Russian: "икс"
-LaTeX: $x$
-
-Russian: "интеграл от икс"
-LaTeX: $\int x$
-
-Russian: "корень из двух"
-LaTeX: $\sqrt{2}$
-
-Russian: "дробь один плюс икс на два"
-LaTeX: $\frac{1+x}{2}$
-
-Russian: "сумма от икс равно один до пяти"
-LaTeX: $\sum_{x=1}^{5}$
-
-NOW CONVERT THIS:
-Russian: "%s"
-LaTeX:`, param1)
+Output ONLY the LaTeX code, no explanations.`, param1, param2)
 
     case "EDIT":
-        return fmt.Sprintf(`Modify the existing LaTeX code according to the instruction.
+        return fmt.Sprintf(`Modify this LaTeX code according to the instruction.
 
-RULES:
-- Output ONLY the modified LaTeX code, no explanations
-- Keep the original structure and add/modify as instructed
-- Use standard LaTeX syntax
-
-EXAMPLES:
-Current LaTeX: $2+3$
-Instruction: "добавь корень из трех"
-Modified: $2+3+\sqrt{3}$
-
-Current LaTeX: $\int x$
-Instruction: "измени икс на икс в квадрате"
-Modified: $\int x^2$
-
-Current LaTeX: $\sqrt{2}$
-Instruction: "добавь плюс один"
-Modified: $\sqrt{2}+1$
-
-NOW MODIFY THIS:
 Current LaTeX: %s
 Instruction: "%s"
-Modified:`, param1, param2)
+
+Output ONLY the modified LaTeX code, no explanations.`, param1, param2)
 
     default:
         return ""
